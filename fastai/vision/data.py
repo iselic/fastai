@@ -319,6 +319,15 @@ class ImageList(ItemList):
             for i,(x,y,z) in enumerate(zip(xs,ys,zs)):
                 x.show(ax=axs[i,0], y=y, **kwargs)
                 x.show(ax=axs[i,1], y=z, **kwargs)
+                      
+class CustomImageItemList(ImageList):
+      def open(self,fn):
+          regex = re.compile(r'\d+')
+          fn = re.findall(regex,fn)
+          df = self.inner_df[self.inner_df.fn.values == int(fn[0])]
+          df_fn = df[df.fn.values == int(fn[0])]
+          img_pixel = df_fn['img'].values
+          return vision.Image(pil2tensor(img_pixel[0],np.float32).div_(255))
 
 class ObjectCategoryProcessor(MultiCategoryProcessor):
     "`PreProcessor` for labelled bounding boxes."
