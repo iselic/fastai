@@ -328,6 +328,13 @@ class CustomImageItemList(ImageList):
           df_fn = df[df.fn.values == int(fn[0])]
           img_pixel = df_fn['img'].values
           return vision.Image(pil2tensor(img_pixel[0],np.float32).div_(255))
+	 
+      def get(self, i):
+        fn = super().get(i)
+        res = self.open(fn)
+        self.sizes[i] = res.size
+        return res
+		
 
 class ObjectCategoryProcessor(MultiCategoryProcessor):
     "`PreProcessor` for labelled bounding boxes."
