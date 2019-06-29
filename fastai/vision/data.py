@@ -123,7 +123,7 @@ class ImageDataBunch(DataBunch):
     def from_df1(cls, path:PathOrStr, df:pd.DataFrame, folder:PathOrStr=None, label_delim:str=None, valid_pct:float=0.2,
                 seed:int=None, fn_col:IntsOrStrs=0, label_col:IntsOrStrs=1, suffix:str='', **kwargs:Any)->'ImageDataBunch':
         "Create from a `DataFrame` `df`."
-        src = (ImageList.from_df1(df, path=path, folder=folder, suffix=suffix, cols=fn_col)
+        src = (CustomImageList.from_df1(df, path=path, folder=folder, suffix=suffix, cols=fn_col)
                 .split_by_rand_pct(valid_pct, seed)
                 .label_from_df(label_delim=label_delim, cols=label_col))
         return cls.create_from_ll(src, **kwargs)
