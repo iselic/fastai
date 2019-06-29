@@ -120,6 +120,15 @@ class ImageDataBunch(DataBunch):
         return cls.create_from_ll(src, **kwargs)
 
     @classmethod
+    def from_df1(cls, path:PathOrStr, df:pd.DataFrame, folder:PathOrStr=None, label_delim:str=None, valid_pct:float=0.2,
+                seed:int=None, fn_col:IntsOrStrs=0, label_col:IntsOrStrs=1, suffix:str='', **kwargs:Any)->'ImageDataBunch':
+        "Create from a `DataFrame` `df`."
+        src = (ImageList.from_df1(df, path=path, folder=folder, suffix=suffix, cols=fn_col)
+                .split_by_rand_pct(valid_pct, seed)
+                .label_from_df(label_delim=label_delim, cols=label_col))
+        return cls.create_from_ll(src, **kwargs)
+
+    @classmethod
     def from_csv(cls, path:PathOrStr, folder:PathOrStr=None, label_delim:str=None, csv_labels:PathOrStr='labels.csv',
                  valid_pct:float=0.2, seed:int=None, fn_col:int=0, label_col:int=1, suffix:str='', delimiter:str=None,
                  header:Optional[Union[int,str]]='infer', **kwargs:Any)->'ImageDataBunch':
@@ -354,6 +363,16 @@ class CustomImageList(ItemList):
         "Get the filenames in `cols` of `df` with `folder` in front of them, `suffix` at the end."
         suffix = suffix or ''
         res = super().from_df(df, path=path, cols=cols, **kwargs)
+        pref = f'{res.path}{os.path.sep}'
+        if folder is not None: pref += f'{folder}{os.path.sep}'
+        res.items = np.char.add(np.char.add(pref, res.items.astype(str)), suffix)
+        return res
+
+    @classmethod
+    def from_df1(cls, df:DataFrame, path:PathOrStr, cols:IntsOrStrs=0, folder:PathOrStr=None, suffix:str='', **kwargs)->'ItemList':
+        "Get the filenames in `cols` of `df` with `folder` in front of them, `suffix` at the end."
+        suffix = suffix or ''
+        res = super().from_df1(df, path=path, cols=cols, **kwargs)
         pref = f'{res.path}{os.path.sep}'
         if folder is not None: pref += f'{folder}{os.path.sep}'
         res.items = np.char.add(np.char.add(pref, res.items.astype(str)), suffix)
